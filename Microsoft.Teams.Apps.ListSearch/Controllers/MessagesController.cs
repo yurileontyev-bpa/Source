@@ -224,12 +224,27 @@ namespace Microsoft.Teams.Apps.ListSearch.Controllers
         // Create URL to a SharePoint list item
         private string CreateListItemUrl(string listUrl, string itemId)
         {
-            var itemUrl = listUrl.Replace("Lists", "SitePages");
-            
+            var itemUrl = listUrl.Replace("Lists", "Pages");
+
+            if (itemUrl.Contains("NonConformances/AllItems.aspx"))
+            {
+                var host = itemUrl.Replace("Pages/NonConformances/AllItems.aspx", string.Empty);
+                var url = itemUrl.Replace("NonConformances/AllItems.aspx", "Non%20Conformance%20Details.aspx?BPAID=" + itemId + "&Source=" + host + "/pages/nonconformances.aspx");
+                return url;
+            }
+
             var finalSlashIndex = itemUrl.LastIndexOf('/');
             if (finalSlashIndex > 0)
             {
-                itemUrl = itemUrl.Substring(0, finalSlashIndex) + ".aspx?BPAID=" + itemId;
+                if (itemUrl[itemUrl.Length - 1] == 's')
+                {
+                    itemUrl = itemUrl.Substring(0, finalSlashIndex - 1) + ".aspx?BPAID=" + itemId;
+
+                }
+                else
+                {
+                    itemUrl = itemUrl.Substring(0, finalSlashIndex) + ".aspx?BPAID=" + itemId;
+                }
             }
 
             return itemUrl;
